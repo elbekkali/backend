@@ -1,0 +1,84 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv/
+env/
+venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Python egg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.coverage
+*.cover
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.lcov
+
+# Pytest
+.pytest_cache/
+
+# mypy type check
+.mypy_cache/
+
+# Pyre type check
+.pyre/
+
+# SQLAlchemy / Alembic
+*.db
+*.sqlite3
+alembic/versions/*.pyc
+
+# Logs and database
+*.log
+
+# Python Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Local folders
+instance/
+data/
+
+# Distribution virtual envs
+.venv/
+venv/
+
+# dotenv environment variables file
+.env
+
+# Uvicorn reload files (common tmp/cache files)
+__pycache__/
+*.pyc
+
+# Misc
+*.bak
+*.swp
+*.swo
+
+# Docker files, if any
+docker-compose.override.yml
+.docker-compose.override.yml
+
+# PyCharm
+.idea/
+

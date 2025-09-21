@@ -1,0 +1,10 @@
+fastapi==0.116.1
+uvicorn==0.35.0
+SQLAlchemy==2.0.43
+psycopg2-binary==2.9.10
+alembic==1.16.5
+pydantic[email]==2.11.7      # Important pour support email & validation
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.5.0
+email-validator==2.3.0      # Optionnel si tu préfères installer séparément
+python-multipart
