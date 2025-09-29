@@ -22,6 +22,8 @@ def create_user_route(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    if current_user.role != UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Action réservée aux admins")
     try:
         db_user = create_user(db=db, user=user)
         logger.info(f"User created: {db_user.email}")
@@ -41,6 +43,8 @@ def read_users(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    if current_user.role != UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Action réservée aux admins")
     try:
         users = get_users(db=db, skip=skip, limit=limit, include_inactive=include_inactive)
         logger.info(f"Read users by {current_user.email}, include_inactive={include_inactive}, count={len(users)}")
@@ -51,6 +55,8 @@ def read_users(
 
 @router.get("/users/{user_id}", response_model=UserRead)
 def read_user(user_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Action réservée aux admins")
     user = get_user(db, user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -72,6 +78,8 @@ def read_active_agents(
 
 @router.put("/users/{user_id}", response_model=UserRead)
 def update_user_route(user_id: UUID, user: UserUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Action réservée aux admins")
     try:
         updated_user = update_user(db, user_id, user)
         if not updated_user:
@@ -84,6 +92,8 @@ def update_user_route(user_id: UUID, user: UserUpdate, db: Session = Depends(get
 
 @router.patch("/users/{user_id}", response_model=UserRead)
 def partial_update_user(user_id: UUID, user_update: UserUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Action réservée aux admins")
     try:
         updated_user = update_user(db, user_id, user_update)
         if not updated_user:
@@ -96,6 +106,8 @@ def partial_update_user(user_id: UUID, user_update: UserUpdate, db: Session = De
 
 @router.patch("/users/{user_id}/deactivate", response_model=UserRead)
 def deactivate_user_route(user_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Action réservée aux admins")
     user = deactivate_user(db, user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found or already deactivated")
@@ -103,7 +115,20 @@ def deactivate_user_route(user_id: UUID, db: Session = Depends(get_db), current_
 
 @router.patch("/users/{user_id}/activate", response_model=UserRead)
 def activate_user_route(user_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Action réservée aux admins")
     user = activate_user(db, user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found or already activated")
     return user
+
+@router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Action réservée aux admins")
+    user = get_user(db, user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    db.delete(user)
+    db.commit()
+    return {"detail": "User deleted"}

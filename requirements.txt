@@ -8,3 +8,4 @@ passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.5.0
 email-validator==2.3.0      # Optionnel si tu préfères installer séparément
 python-multipart
+python-dotenv==1.0.1

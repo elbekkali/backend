@@ -39,13 +39,14 @@ L’API backend est construite avec FastAPI et inclut :
   ```
 
 4. Installe ou mets à jour les dépendances (optionnel si déjà fait) :
-
-### `pip install -r requirements.txt`
+  ```
+  pip install -r requirements.txt
+  ```
 
 5. Lance le serveur FastAPI en mode développement avec rechargement automatique :
-
-### `uvicorn app.main:app --reload`
-
+  ```
+  uvicorn app.main:app --reload
+  ```
 
 6. Ouvre un navigateur sur :  
 [http://127.0.0.1:8000](http://127.0.0.1:8000)  

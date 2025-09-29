@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, List
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -7,11 +7,10 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from app.database import get_db
-from app.models.user import User, UserRole
+from app.models.user import User, UserRole, RefreshToken
+from app.config import REFRESH_TOKEN_EXPIRE_DAYS, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+import uuid
 
-SECRET_KEY = "CHANGE_THIS_SECRET_FOR_PRODUCTION"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
@@ -39,6 +38,26 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def create_refresh_token(db: Session, user_id: uuid.UUID) -> str:
+    expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    token = str(uuid.uuid4())
+    refresh_token = RefreshToken(user_id=user_id, token=token, expires_at=expires_at)
+    db.add(refresh_token)
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating refresh token: {str(e)}")
+    db.refresh(refresh_token)
+    return token
+
+def validate_refresh_token(db: Session, token: str) -> Optional[RefreshToken]:
+    """Validate a refresh token and return it if valid."""
+    refresh_token = db.query(RefreshToken).filter(RefreshToken.token == token).first()
+    if not refresh_token or refresh_token.expires_at < datetime.now(timezone.utc):  # Remplace datetime.utcnow()
+        return None
+    return refresh_token
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     credentials_exception = HTTPException(
