@@ -12,7 +12,7 @@ from app.config import REFRESH_TOKEN_EXPIRE_DAYS, SECRET_KEY, ALGORITHM, ACCESS_
 import uuid
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
 class TokenData(BaseModel):
