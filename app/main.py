@@ -11,6 +11,9 @@ origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://agency-frontend-kappa.vercel.app",
+    "https://agency-frontend-git-develop-elbekkams-projects.vercel.app",
+    "https://agency-frontend-a3zqme5tt-elbekkams-projects.vercel.app"
+
 ]
 
 app.add_middleware(
